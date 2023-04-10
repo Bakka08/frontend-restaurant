@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Finder</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/Animated-Pretty-Product-List-v12-Animated-Pretty-Product-List.css">
+    <link rel="stylesheet" href="assets/css/Pretty-Product-List-.css">
+    <style>
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+  
+        .full-width {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <section class="py-5"></section>
+    <section>
+        <div class="container bg-dark py-5 full-width">
+            <div class="row">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <p class="fw-bold text-success mb-2">Map</p>
+                    <h3 class="fw-bold">Location Of  &nbsp;&nbsp;"<span style="color:#20f4ac ;" id="aaa"></span>"</h3>
+                    <br>
+                </div>
+            </div>
+            <div style="height: 700px; width: 100%;">
+
+                <div id="map"></div>
+                <script>
+                    function initMap() {
+                        const query  = window.location.search;
+                        const url = new URLSearchParams(query)
+                        
+                          const map = new google.maps.Map(document.getElementById("map"), {
+                            zoom: 16,
+                            center: { lat: parseFloat(url.get("lat")), lng: parseFloat(url.get("log"))},
+                          });
+                         
+                          const beachMarker = new google.maps.Marker({
+                            position: { lat: parseFloat(url.get("lat")), lng: parseFloat(url.get("log"))},
+                            map,
+                          
+                          });
+                             const a =  url.get('nom');
+                        const h3 = document.getElementById('aaa');
+                        h3.textContent = a;
+                        }
+                        window.initMap = initMap;
+                     
+                        
+                </script>
+                <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCL2iY-ZKR_hF0DhX76LF2ZoyEr1Q2c83w&callback=initMap">
+                </script>
+
+            </div>
+        </div>
+    </section>
+    <section></section>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/Animated-Pretty-Product-List-v12-Animated-Pretty-Product-List.js"></script>
+    <script src="assets/js/bold-and-dark.js"></script>
+    <script src="assets/js/showPopup.js"></script>
+</body>
+
+</html>
