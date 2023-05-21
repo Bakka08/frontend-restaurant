@@ -599,7 +599,8 @@ function App() {
             });
             axios.put(`http://localhost:8080/api/users/addrestau/${user.id}/${response.data.id}`)
             .then((response) => {
-              checkowner(user.id)
+              checkowner(user.id);
+              checkowner2(user.id);
              
             })
             .catch((error) => {
@@ -631,7 +632,8 @@ function App() {
         setZoneId('');
       });
     };
-    
+    const [addrestaurant, setaddrestaurant] = useState(false);
+    const [hasrestaurant, sethasrestaurant] = useState(false);
 
     function checkowner(id) {
       fetch(`http://localhost:8080/api/users/findrestau/${id}`)
@@ -644,22 +646,44 @@ function App() {
         })
         .then((data) => {
           if (data == 1) {
-            setshowOwner1(false);
-            setshowOwner2(true);
+            setaddrestaurant(false);
+            sethasrestaurant(true);
+            checkowner2(id);
           }  if (data == 0) {
-            setshowOwner1(true);
-            setshowOwner2(false);
+            setaddrestaurant(true);
+            sethasrestaurant(false);
           }
         })
         .catch((error) => {
           console.error(error);
         });
     }
+    function checkowner2(id) {
+      fetch(`http://localhost:8080/api/users/findrestauu/${id}`)
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Request failed');
+          }
+        })
+        .then((data) => {
+         setrestaurant2(data);
+
+         
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
     
-    
-    
-    const [showOwner1, setshowOwner1] = useState(false);
-    const [showOwner2, setshowOwner2] = useState(false);
+    const [restaurant2, setrestaurant2] = useState(null);
+    function deleterestaurant(){
+
+
+    }
+
+  
       return (
         <div id='main' style={{ overflow: "hidden" }}>
           <meta charSet="utf-8" />
@@ -1124,7 +1148,7 @@ function App() {
                 </div>
         </div>
         <div id='Owner' style={{ display: showOwner ? 'block' : 'none' }}>
-                <div id='addrestaurant'  style={{ display: showOwner1 ? 'block' : 'none' }} >
+                <div id='addrestaurant'  style={{ display: addrestaurant ? 'block' : 'none' }} >
               <nav className="navbar navbar-dark navbar-expand-md " id="mainNav" style={{backgroundColor: '#19f5aa'}}>
                <div className="container"><a className="navbar-brand d-flex align-items-center"  style={{color:'#28242c'}} ><span></span></a><button data-bs-toggle="collapse" className="navbar-toggler" data-bs-target="#navcol-1"><span className="visually-hidden">Toggle navigation</span><span className="navbar-toggler-icon" /></button>
                 <div className="collapse navbar-collapse" id="navcol-1">
@@ -1251,7 +1275,7 @@ function App() {
                     
 
                               </div>
-                <div id='hasrestaurant'  style={{ display: showOwner2 ? 'block' : 'none' }}  >
+                <div id='hasrestaurant'  style={{ display: hasrestaurant ? 'block' : 'none' }}  >
                 <nav className="navbar navbar-dark navbar-expand-md " id="mainNav" style={{backgroundColor: '#19f5aa'}}>
                <div className="container"><a className="navbar-brand d-flex align-items-center"  style={{color:'#28242c'}} ><span></span></a><button data-bs-toggle="collapse" className="navbar-toggler" data-bs-target="#navcol-1"><span className="visually-hidden">Toggle navigation</span><span className="navbar-toggler-icon" /></button>
                 <div className="collapse navbar-collapse" id="navcol-1">
@@ -1275,7 +1299,6 @@ function App() {
                 <table id="example" className="table table-striped table-bordered" cellSpacing={0} width="100%">
       <thead>
         <tr>
-          <th style={{ textAlign: "center" }}>Id</th>
           <th style={{ textAlign: "center" }}>City</th>
           <th style={{ textAlign: "center" }}>Zone</th>
           <th style={{ textAlign: "center" }}>Adresse</th>
@@ -1283,22 +1306,35 @@ function App() {
           <th style={{ textAlign: "center" }}>Hour closed</th>
           <th style={{ textAlign: "center" }}>Latitude</th>
           <th style={{ textAlign: "center" }}>Longitude</th>
+          <th style={{ textAlign: "center" }}>Zone</th>
+          <th style={{ textAlign: "center" }}>City</th>
+          <th style={{ textAlign: "center" }}>Serie</th>
           <th style={{ textAlign: "center" }}>Action</th>
         
         </tr>
       </thead>
-      <tbody>
-        {citiees.map((city) => (
-          <tr key={city.id}>
-            <td style={{ textAlign: "center" }}>{city.id}</td>
-            <td style={{ textAlign: "center" }}>{city.nom}</td>
-            <td style={{ textAlign: "center" }}>
-              <button type="button" className="btn btn-danger"onClick={() => deleteCity(city.id)}>Delete</button>
-              <button type="button" className="btn btn-warning">Update</button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
+      {restaurant2 && (
+  <tbody>
+    <tr key={restaurant2.id}>   
+    <td style={{ textAlign: "center" }}>{restaurant2.nom}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.adresse}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.description}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.latitude}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.longitude}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.hourOpened}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.hourClosed}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.zone.nom}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.zone.ville.nom}</td>
+      <td style={{ textAlign: "center" }}>{restaurant2.serie.nom}</td>
+
+      <td style={{ textAlign: "center" }}>
+        <button type="button" className="btn btn-danger" onClick={() => deleterestaurant(restaurant2.id)}>Delete</button>
+        <button type="button" className="btn btn-warning">Update</button>
+      </td>
+    </tr>
+  </tbody>
+)}
+
     </table>
                 </div>
               </div>
