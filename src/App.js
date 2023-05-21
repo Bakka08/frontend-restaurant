@@ -184,6 +184,7 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [showOwner, setShowOwner] = useState(false);
 
+
   const handleLogin = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/api/users/${email}/${password}`);
@@ -191,6 +192,7 @@ function App() {
       setLoggedIn(true);
       if (response.data.roles.length === 0) {
        setShowOwner(true);
+       checkowner(response.data.id);
       } else {
         setShowAdmin(true);
       }
@@ -482,6 +484,7 @@ function App() {
         setShowSecondDiv(false);
         setShowThirdDiv(true);
         setShowFourthDiv(false);
+        
 
       } catch (error) {
         console.error(error);
@@ -574,7 +577,6 @@ function App() {
         }
       })
       .then((response) => {
-        console.log(response);
         alert('Restaurant added successfully!');
        
       
@@ -586,7 +588,7 @@ function App() {
          
             axios.post(`http://localhost:8080/api/photo/save/${imageName}/${response.data.id}`)
             .then((response) => {
-              console.log(response);
+             
               alert('Photo saved successfully');
               setNomm('');setAdresse('');setDescription('');setLatitude('');setLongitude('');setHourOpened('');setHourClosed('');setSerieId('');setZoneId('');
             })
@@ -595,6 +597,18 @@ function App() {
               alert('Error saving photo');
               setNomm('');setAdresse('');setDescription('');setLatitude('');setLongitude('');setHourOpened('');setHourClosed('');setSerieId('');setZoneId('');
             });
+            axios.put(`http://localhost:8080/api/users/addrestau/${user.id}/${response.data.id}`)
+            .then((response) => {
+              checkowner(user.id)
+             
+            })
+            .catch((error) => {
+              console.log(error); 
+         
+            });
+
+
+
           })
           .catch((error) => {
             console.log(error);
@@ -619,6 +633,33 @@ function App() {
     };
     
 
+    function checkowner(id) {
+      fetch(`http://localhost:8080/api/users/findrestau/${id}`)
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Request failed');
+          }
+        })
+        .then((data) => {
+          if (data == 1) {
+            setshowOwner1(false);
+            setshowOwner2(true);
+          }  if (data == 0) {
+            setshowOwner1(true);
+            setshowOwner2(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+    
+    
+    
+    const [showOwner1, setshowOwner1] = useState(false);
+    const [showOwner2, setshowOwner2] = useState(false);
       return (
         <div id='main' style={{ overflow: "hidden" }}>
           <meta charSet="utf-8" />
@@ -1083,7 +1124,7 @@ function App() {
                 </div>
         </div>
         <div id='Owner' style={{ display: showOwner ? 'block' : 'none' }}>
-                <div id='addrestaurant'>
+                <div id='addrestaurant'  style={{ display: showOwner1 ? 'block' : 'none' }} >
               <nav className="navbar navbar-dark navbar-expand-md " id="mainNav" style={{backgroundColor: '#19f5aa'}}>
                <div className="container"><a className="navbar-brand d-flex align-items-center"  style={{color:'#28242c'}} ><span></span></a><button data-bs-toggle="collapse" className="navbar-toggler" data-bs-target="#navcol-1"><span className="visually-hidden">Toggle navigation</span><span className="navbar-toggler-icon" /></button>
                 <div className="collapse navbar-collapse" id="navcol-1">
@@ -1107,111 +1148,164 @@ function App() {
                       <div className="card-body px-4 py-5 px-md-5" style={{alignItems: 'center', display: 'flex', justifyContent: 'center'}}>
                       <div style={{display: 'flex', flexDirection: 'column'}}>
                         
-  {/* Nom */}
-  <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={nomm} onChange={handleNommChange}>
-      <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Nom' name="nom"></input>
-  </div>
-
-  {/* Adresse */}
-  <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={adresse} onChange={handleAdresseChange}>
-    
-    <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Adresse' name="adresse"></input>
-  </div>
-
-  {/* Description */}
-  <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={description} onChange={handleDescriptionChange} >
-
-    <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Description ' name="description"></input>
-  </div>
-
-  {/* Latitude */}
-  <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={latitude} onChange={handleLatitudeChange} >
-   
-    <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Latitude' name="latitude"></input>
-  </div>
-
-{/* Longitude */}
-<div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={longitude} onChange={handleLongitudeChange}>
-
-  <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Longitude ' name="longitude"></input>
-</div>
-
-{/* Hour Opened */}
-<div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={hourOpened} onChange={handleHourOpenedChange}>
-
-  <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Hour Opened' name="hourOpened"></input>
-</div>
-
-{/* Hour Closed */}
-<div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}value={hourClosed} onChange={handleHourClosedChange}>
-  
-  <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Hour Closed' name="hourClosed"></input>
-</div>
-
-{/* Serie */}
-<div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
-<select style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}}  value={serieId} onChange={handleSerieIdChange}>
-
-<option value="none">Select a serie</option>
-
-    {series.map(serie => (
-    <option key={serie.id} value={serie.id}>
-    {serie.nom}
-    </option>
-    ))}
-</select>
-</div>
-
-<div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
-<select value={selectedCity} style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} id="city-select"  onChange={handleCityChange} >
-                                        <option value=""  >Select a city</option>
-                                            {cities.map(city => (
-                                        <option key={city.id} value={city.nom}>
-                                            {city.nom}
-                                        </option>
-                                                          ))}
-                          
-                          </select>
-                          </div>
-<div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
-<select style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} id="zone-select" value={zoneId} onChange={handleZoneIdChange}>
-                                        <option value="none">Select a zone</option>
-                                            {zones.map(zone => (
-                                        <option key={zone.id} value={zone.id}>
-                                            {zone.nom}
-                                        </option>
-                                                            ))}
-
-                          </select>
-                          </div>
-{/* Image */}
-
-<div className="file-input-container" >
-      <input type="file" className="file-input" onChange={handleFileInputChange}  />
-     {console.log({imageName})} 
-      <label className="file-input-label" style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}}  > Choose image</label>
-    </div>
-    <br></br>
-    <button className="fw-bold"  style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#20f4ac',color:'black',textAlignLast: "center"}} onClick={handleSubmit} >Add</button>
-
-</div>
-
-
-                      </div>
-                     
-                    </div>
-                  </div>
-              
+                {/* Nom */}
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={nomm} onChange={handleNommChange}>
+                    <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Nom' name="nom"></input>
                 </div>
 
-              
+                {/* Adresse */}
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={adresse} onChange={handleAdresseChange}>
+                  
+                  <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Adresse' name="adresse"></input>
+                </div>
+
+                {/* Description */}
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={description} onChange={handleDescriptionChange} >
+
+                  <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Description ' name="description"></input>
+                </div>
+
+                {/* Latitude */}
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={latitude} onChange={handleLatitudeChange} >
+                
+                  <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Latitude' name="latitude"></input>
+                </div>
+
+              {/* Longitude */}
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={longitude} onChange={handleLongitudeChange}>
+
+                <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Longitude ' name="longitude"></input>
+              </div>
+
+              {/* Hour Opened */}
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}} value={hourOpened} onChange={handleHourOpenedChange}>
+
+                <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Hour Opened' name="hourOpened"></input>
+              </div>
+
+              {/* Hour Closed */}
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}value={hourClosed} onChange={handleHourClosedChange}>
+                
+                <input style={{margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} placeholder='Hour Closed' name="hourClosed"></input>
+              </div>
+
+              {/* Serie */}
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
+              <select style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}}  value={serieId} onChange={handleSerieIdChange}>
+
+              <option value="none">Select a serie</option>
+
+                  {series.map(serie => (
+                  <option key={serie.id} value={serie.id}>
+                  {serie.nom}
+                  </option>
+                  ))}
+              </select>
+              </div>
+
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
+              <select value={selectedCity} style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} id="city-select"  onChange={handleCityChange} >
+                                                      <option value=""  >Select a city</option>
+                                                          {cities.map(city => (
+                                                      <option key={city.id} value={city.nom}>
+                                                          {city.nom}
+                                                      </option>
+                                                                        ))}
+                                        
+                                        </select>
+                                        </div>
+              <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
+              <select style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}} id="zone-select" value={zoneId} onChange={handleZoneIdChange}>
+                                                      <option value="none">Select a zone</option>
+                                                          {zones.map(zone => (
+                                                      <option key={zone.id} value={zone.id}>
+                                                          {zone.nom}
+                                                      </option>
+                                                                          ))}
+
+                                        </select>
+                                        </div>
+              {/* Image */}
+
+              <div className="file-input-container" >
+                    <input type="file" className="file-input" onChange={handleFileInputChange}  />
+                  {console.log({imageName})} 
+                    <label className="file-input-label" style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#28242c',color:'white',textAlignLast: "center"}}  > Choose image</label>
+                  </div>
+                  <br></br>
+                  <button className="fw-bold"  style={{display: 'inline-block', margin: '0 10px', padding: '5px', borderRadius: '10px', width: '200px',backgroundColor: '#20f4ac',color:'black',textAlignLast: "center"}} onClick={handleSubmit} >Add</button>
+
+              </div>
+
+
+                                    </div>
+                                  
+                                  </div>
+                                </div>
+                            
+                              </div>
+
+                            
+                            </div>
+                          </div>
+                    
+
+                              </div>
+                <div id='hasrestaurant'  style={{ display: showOwner2 ? 'block' : 'none' }}  >
+                <nav className="navbar navbar-dark navbar-expand-md " id="mainNav" style={{backgroundColor: '#19f5aa'}}>
+               <div className="container"><a className="navbar-brand d-flex align-items-center"  style={{color:'#28242c'}} ><span></span></a><button data-bs-toggle="collapse" className="navbar-toggler" data-bs-target="#navcol-1"><span className="visually-hidden">Toggle navigation</span><span className="navbar-toggler-icon" /></button>
+                <div className="collapse navbar-collapse" id="navcol-1">
+                
+
+                <ul className="navbar-nav mx-auto" /><a className="btn btn-primary shadow" role="button" style={{backgroundColor: '#20f4ac',color:'#28242c',border:'none'}} onClick={handleLogout} >Logout</a>
+              </div>
+               </div>
+               </nav>
+            <div id='Select' className="container bg-dark py-5"  >
+              <div className="row">
+                <div className="col-md-8 col-xl-6 text-center mx-auto">
+                  <p className="fw-bold text-success mb-2">Update your restaurant</p>
+                  <h3 className="fw-bold">Welcome <span>{(user.nom)}</span></h3>
+                </div>
+              </div>
+              <div className="py-5 p-lg-5">
+     
+
+                <div className="row row-cols-1 row-cols-md-2 mx-auto" style={{maxWidth: '900px'}}>
+                <table id="example" className="table table-striped table-bordered" cellSpacing={0} width="100%">
+      <thead>
+        <tr>
+          <th style={{ textAlign: "center" }}>Id</th>
+          <th style={{ textAlign: "center" }}>City</th>
+          <th style={{ textAlign: "center" }}>Zone</th>
+          <th style={{ textAlign: "center" }}>Adresse</th>
+          <th style={{ textAlign: "center" }}>Hour opened</th>
+          <th style={{ textAlign: "center" }}>Hour closed</th>
+          <th style={{ textAlign: "center" }}>Latitude</th>
+          <th style={{ textAlign: "center" }}>Longitude</th>
+          <th style={{ textAlign: "center" }}>Action</th>
+        
+        </tr>
+      </thead>
+      <tbody>
+        {citiees.map((city) => (
+          <tr key={city.id}>
+            <td style={{ textAlign: "center" }}>{city.id}</td>
+            <td style={{ textAlign: "center" }}>{city.nom}</td>
+            <td style={{ textAlign: "center" }}>
+              <button type="button" className="btn btn-danger"onClick={() => deleteCity(city.id)}>Delete</button>
+              <button type="button" className="btn btn-warning">Update</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+                </div>
               </div>
             </div>
-       
-
-                </div>
-        </div>       
-      </div>
+                                 </div>                           
+                      </div>       
+                    </div>
           ) : (
         <div id='login'>
       <meta charSet="utf-8" />
