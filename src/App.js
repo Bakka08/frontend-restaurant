@@ -817,7 +817,7 @@ function App() {
             <div className="col-sm-6 col-md-4 product-item animation-element slide-top-left" key={index}>
             <div className="product-container" >
               <div className="row">
-                <div className="col-md-12"><a className="product-image" href="#"><img src="assets/img/862730.jpg" /></a></div>
+                <div className="col-md-12"><a className="product-image" href="#"><img src={restaurant.photos[0].url} /></a></div>
               </div>
               <div class="row">
                         <div class="col-8">
